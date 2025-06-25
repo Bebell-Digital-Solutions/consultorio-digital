@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Doctor carousel functionality - IMPROVED VERSION
+  // Doctor carousel functionality - UPDATED AND IMPROVED
   const doctorsGrid = document.querySelector('.doctors__grid');
   const doctorCards = document.querySelectorAll('.doctors__card');
   const prevBtn = document.querySelector('.doctors__nav span:first-child');
@@ -63,87 +63,118 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (doctorsGrid && prevBtn && nextBtn && doctorCards.length > 0) {
     let currentIndex = 0;
-    let cardsPerView = 3; // Default number of visible cards
+    let cardsPerView = calculateCardsPerView();
+    let isAnimating = false;
+    const animationDuration = 300; // ms
     
-    // Calculate how many cards should be visible based on screen size
+    // Calculate visible cards based on screen size
     function calculateCardsPerView() {
-      if (window.innerWidth < 768) {
-        return 1;
-      } else if (window.innerWidth < 1024) {
-        return 2;
-      }
+      if (window.innerWidth < 600) return 1;
+      if (window.innerWidth < 900) return 2;
       return 3;
     }
     
-    // Update carousel position
-    function updateCarousel() {
-      const cardWidth = doctorCards[0].offsetWidth + 32; // card + gap
-      doctorsGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-      
-      // Disable/enable navigation buttons based on position
-      prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
-      prevBtn.style.pointerEvents = currentIndex === 0 ? 'none' : 'all';
-      
-      nextBtn.style.opacity = currentIndex >= doctorCards.length - cardsPerView ? '0.5' : '1';
-      nextBtn.style.pointerEvents = currentIndex >= doctorCards.length - cardsPerView ? 'none' : 'all';
+    // Get the width of a single card including margin/gap
+    function getCardWidth() {
+      const cardStyle = window.getComputedStyle(doctorCards[0]);
+      const cardWidth = doctorCards[0].offsetWidth;
+      const cardMargin = parseFloat(cardStyle.marginRight || 0);
+      return cardWidth + cardMargin;
     }
     
-    // Handle window resize
-    function handleCarouselResize() {
-      cardsPerView = calculateCardsPerView();
-      currentIndex = Math.min(currentIndex, Math.max(0, doctorCards.length - cardsPerView));
-      updateCarousel();
+    // Update carousel position with smooth transition
+    function updateCarousel(direction = null) {
+      if (isAnimating) return;
+      isAnimating = true;
+      
+      const cardWidth = getCardWidth();
+      const maxIndex = Math.max(0, doctorCards.length - cardsPerView);
+      
+      // Handle automatic wrapping if needed
+      if (direction === 'next' && currentIndex >= maxIndex) {
+        currentIndex = maxIndex;
+      } else if (direction === 'prev' && currentIndex <= 0) {
+        currentIndex = 0;
+      }
+      
+      doctorsGrid.style.transition = `transform ${animationDuration}ms ease`;
+      doctorsGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+      
+      // Update button states
+      updateButtonStates();
+      
+      // Reset animation flag after transition completes
+      setTimeout(() => {
+        doctorsGrid.style.transition = '';
+        isAnimating = false;
+      }, animationDuration);
+    }
+    
+    // Update navigation button states
+    function updateButtonStates() {
+      const maxIndex = Math.max(0, doctorCards.length - cardsPerView);
+      prevBtn.classList.toggle('disabled', currentIndex === 0);
+      nextBtn.classList.toggle('disabled', currentIndex >= maxIndex);
     }
     
     // Navigation handlers
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
         currentIndex--;
-        updateCarousel();
+        updateCarousel('prev');
       }
     });
     
     nextBtn.addEventListener('click', () => {
       if (currentIndex < doctorCards.length - cardsPerView) {
         currentIndex++;
-        updateCarousel();
+        updateCarousel('next');
       }
     });
     
-    // Initialize
-    cardsPerView = calculateCardsPerView();
-    updateCarousel();
-    window.addEventListener('resize', handleCarouselResize);
+    // Handle window resize
+    function handleCarouselResize() {
+      const newCardsPerView = calculateCardsPerView();
+      if (newCardsPerView !== cardsPerView) {
+        cardsPerView = newCardsPerView;
+        currentIndex = Math.min(currentIndex, Math.max(0, doctorCards.length - cardsPerView));
+        updateCarousel();
+      }
+    }
     
-    // Add touch support for mobile devices
+    // Touch/swipe support for mobile devices
     let touchStartX = 0;
     let touchEndX = 0;
+    const swipeThreshold = 50;
     
     doctorsGrid.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-    }, {passive: true});
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
     
-    doctorsGrid.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      handleSwipe();
-    }, {passive: true});
+    doctorsGrid.addEventListener('touchmove', (e) => {
+      touchEndX = e.touches[0].clientX;
+    }, { passive: true });
     
-    function handleSwipe() {
-      const swipeThreshold = 50; // Minimum swipe distance to trigger navigation
-      
-      if (touchStartX - touchEndX > swipeThreshold) {
-        // Swipe left - go next
-        if (currentIndex < doctorCards.length - cardsPerView) {
-          currentIndex++;
-          updateCarousel();
-        }
-      } else if (touchEndX - touchStartX > swipeThreshold) {
-        // Swipe right - go previous
-        if (currentIndex > 0) {
-          currentIndex--;
-          updateCarousel();
+    doctorsGrid.addEventListener('touchend', () => {
+      const diffX = touchStartX - touchEndX;
+      if (Math.abs(diffX) > swipeThreshold) {
+        if (diffX > 0) {
+          // Swipe left - next
+          nextBtn.click();
+        } else {
+          // Swipe right - previous
+          prevBtn.click();
         }
       }
+    }, { passive: true });
+    
+    // Initialize
+    updateButtonStates();
+    window.addEventListener('resize', handleCarouselResize);
+    
+    // Make first card slightly larger for better visual effect
+    if (doctorCards.length > 0) {
+      doctorCards[0].classList.add('active');
     }
   }
   
