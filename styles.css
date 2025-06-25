@@ -339,6 +339,16 @@ header {
   cursor: pointer;
 }
 
+
+.doctors__nav span.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+
+
 .doctors__grid {
   display: flex;
   overflow: hidden;
