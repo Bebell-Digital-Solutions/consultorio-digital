@@ -551,3 +551,41 @@ header {
     gap: 1rem;
   }
 }
+
+
+
+
+
+
+.doctors__grid {
+  display: flex;
+  overflow: hidden;
+  gap: 2rem;
+  scroll-behavior: smooth;
+}
+
+.doctors__card {
+  min-width: calc(33.33% - 2rem); /* Show 3 cards at a time (adjust as needed) */
+  flex: 0 0 auto;
+  transition: transform 0.3s ease;
+}
+
+/* For smaller screens you might want to show fewer cards */
+@media (max-width: 768px) {
+  .doctors__card {
+    min-width: calc(50% - 2rem); /* Show 2 cards on tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .doctors__card {
+    min-width: 100%; /* Show 1 card on mobile */
+  }
+}
+
+
+
+
+
+
+
