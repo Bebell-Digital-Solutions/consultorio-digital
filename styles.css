@@ -340,13 +340,17 @@ header {
 }
 
 .doctors__grid {
-  margin-top: 4rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  overflow: hidden;
   gap: 2rem;
+  scroll-behavior: smooth;
+  margin-top: 4rem;
 }
 
 .doctors__card {
+  min-width: calc(33.33% - 1.33rem); /* 3 cards visible at once */
+  flex: 0 0 auto;
+  transition: transform 0.3s ease;
   text-align: center;
   box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
