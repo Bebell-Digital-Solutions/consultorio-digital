@@ -136,39 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
-  const doctorsGrid = document.querySelector('.doctors__grid');
-  const prevBtn = document.querySelector('.doctors__nav span:first-child');
-  const nextBtn = document.querySelector('.doctors__nav span:last-child');
-  const doctorCards = document.querySelectorAll('.doctors__card');
-  const cardWidth = doctorCards[0].offsetWidth + 32; // width + gap
-  let currentPosition = 0;
-  const visibleCards = 3; // Number of cards visible at once
-
-  nextBtn.addEventListener('click', function() {
-    if (currentPosition > -(doctorCards.length - visibleCards) * cardWidth) {
-      currentPosition -= cardWidth;
-      doctorsGrid.style.transform = `translateX(${currentPosition}px)`;
-    }
-  });
-
-  prevBtn.addEventListener('click', function() {
-    if (currentPosition < 0) {
-      currentPosition += cardWidth;
-      doctorsGrid.style.transform = `translateX(${currentPosition}px)`;
-    }
-  });
-
-  // Handle responsive changes
-  window.addEventListener('resize', function() {
-    cardWidth = doctorCards[0].offsetWidth + 32;
-    doctorsGrid.style.transform = `translateX(0)`;
-    currentPosition = 0;
-  });
-});
-
-
-
 
 
 
