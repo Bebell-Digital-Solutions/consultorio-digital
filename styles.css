@@ -341,10 +341,13 @@ header {
 
 .doctors__grid {
   margin-top: 4rem;
-  display: grid;
+  display: flex;
   grid-template-columns: repeat(3, 1fr);
+  transition: transform 0.3s ease;
   gap: 2rem;
+  user-select: none;  
 }
+
 
 .doctors__card {
   text-align: center;
@@ -352,6 +355,7 @@ header {
   border-radius: 10px;
   cursor: pointer;
   overflow: hidden;
+  flex: 0 0 auto;
 }
 
 .doctors__card__image {
@@ -401,6 +405,13 @@ header {
   margin-bottom: 1rem;
   color: var(--text-light);
 }
+
+
+
+
+
+
+
 
 .footer {
   background-color: var(--primary-color-light);
@@ -556,32 +567,6 @@ header {
 
 
 
-
-.doctors__grid {
-  display: flex;
-  overflow: hidden;
-  gap: 2rem;
-  scroll-behavior: smooth;
-}
-
-.doctors__card {
-  min-width: calc(33.33% - 2rem); /* Show 3 cards at a time (adjust as needed) */
-  flex: 0 0 auto;
-  transition: transform 0.3s ease;
-}
-
-/* For smaller screens you might want to show fewer cards */
-@media (max-width: 768px) {
-  .doctors__card {
-    min-width: calc(50% - 2rem); /* Show 2 cards on tablets */
-  }
-}
-
-@media (max-width: 480px) {
-  .doctors__card {
-    min-width: 100%; /* Show 1 card on mobile */
-  }
-}
 
 
 
