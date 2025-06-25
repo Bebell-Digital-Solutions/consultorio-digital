@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Doctor carousel functionality - UPDATED AND IMPROVED
+  // Doctor carousel functionality - SIMPLIFIED AND WORKING VERSION
   const doctorsGrid = document.querySelector('.doctors__grid');
   const doctorCards = document.querySelectorAll('.doctors__card');
   const prevBtn = document.querySelector('.doctors__nav span:first-child');
@@ -63,84 +63,41 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (doctorsGrid && prevBtn && nextBtn && doctorCards.length > 0) {
     let currentIndex = 0;
-    let cardsPerView = calculateCardsPerView();
-    let isAnimating = false;
-    const animationDuration = 300; // ms
+    let cardWidth = doctorCards[0].offsetWidth + 32; // card width + gap (2rem = 32px)
     
-    // Calculate visible cards based on screen size
-    function calculateCardsPerView() {
+    function updateCarousel() {
+      doctorsGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+      
+      // Update button states
+      prevBtn.classList.toggle('disabled', currentIndex === 0);
+      nextBtn.classList.toggle('disabled', currentIndex >= doctorCards.length - getCardsPerView());
+    }
+    
+    function getCardsPerView() {
       if (window.innerWidth < 600) return 1;
       if (window.innerWidth < 900) return 2;
       return 3;
     }
     
-    // Get the width of a single card including margin/gap
-    function getCardWidth() {
-      const cardStyle = window.getComputedStyle(doctorCards[0]);
-      const cardWidth = doctorCards[0].offsetWidth;
-      const cardMargin = parseFloat(cardStyle.marginRight || 0);
-      return cardWidth + cardMargin;
+    function handleResize() {
+      cardWidth = doctorCards[0].offsetWidth + 32;
+      currentIndex = Math.min(currentIndex, Math.max(0, doctorCards.length - getCardsPerView()));
+      updateCarousel();
     }
     
-    // Update carousel position with smooth transition
-    function updateCarousel(direction = null) {
-      if (isAnimating) return;
-      isAnimating = true;
-      
-      const cardWidth = getCardWidth();
-      const maxIndex = Math.max(0, doctorCards.length - cardsPerView);
-      
-      // Handle automatic wrapping if needed
-      if (direction === 'next' && currentIndex >= maxIndex) {
-        currentIndex = maxIndex;
-      } else if (direction === 'prev' && currentIndex <= 0) {
-        currentIndex = 0;
-      }
-      
-      doctorsGrid.style.transition = `transform ${animationDuration}ms ease`;
-      doctorsGrid.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-      
-      // Update button states
-      updateButtonStates();
-      
-      // Reset animation flag after transition completes
-      setTimeout(() => {
-        doctorsGrid.style.transition = '';
-        isAnimating = false;
-      }, animationDuration);
-    }
-    
-    // Update navigation button states
-    function updateButtonStates() {
-      const maxIndex = Math.max(0, doctorCards.length - cardsPerView);
-      prevBtn.classList.toggle('disabled', currentIndex === 0);
-      nextBtn.classList.toggle('disabled', currentIndex >= maxIndex);
-    }
-    
-    // Navigation handlers
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
         currentIndex--;
-        updateCarousel('prev');
+        updateCarousel();
       }
     });
     
     nextBtn.addEventListener('click', () => {
-      if (currentIndex < doctorCards.length - cardsPerView) {
+      if (currentIndex < doctorCards.length - getCardsPerView()) {
         currentIndex++;
-        updateCarousel('next');
-      }
-    });
-    
-    // Handle window resize
-    function handleCarouselResize() {
-      const newCardsPerView = calculateCardsPerView();
-      if (newCardsPerView !== cardsPerView) {
-        cardsPerView = newCardsPerView;
-        currentIndex = Math.min(currentIndex, Math.max(0, doctorCards.length - cardsPerView));
         updateCarousel();
       }
-    }
+    });
     
     // Touch/swipe support for mobile devices
     let touchStartX = 0;
@@ -169,13 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { passive: true });
     
     // Initialize
-    updateButtonStates();
-    window.addEventListener('resize', handleCarouselResize);
-    
-    // Make first card slightly larger for better visual effect
-    if (doctorCards.length > 0) {
-      doctorCards[0].classList.add('active');
-    }
+    updateCarousel();
+    window.addEventListener('resize', handleResize);
   }
   
   // Form submission handling
