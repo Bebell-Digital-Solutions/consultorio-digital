@@ -387,6 +387,7 @@ header {
 .doctors__card {
   flex: 0 0 calc(33.333% - 1.33rem); /* 3 cards with gap */
   min-width: calc(33.333% - 1.33rem); /* Ensures 3 cards fit */
+  max-width: calc(33.333% - 1.33rem);
   transition: transform 0.3s ease;
   text-align: center;
   box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
